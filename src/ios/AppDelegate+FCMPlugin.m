@@ -192,6 +192,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
         NSLog(@"APP WAS CLOSED DURING PUSH RECEPTION Saved data: %@", jsonData);
         lastPush = jsonData;
     }
+    
 }
 // [END receive_message in background] iOS < 10]
 
@@ -223,6 +224,12 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
     //                              foreground (user taps notification)
 
     UIApplicationState state = application.applicationState;
+
+    if let apsInfo = userInfo["aps"] as? [AnyHashable: Any], let bestAttemptContent = bestAttemptContent  {                
+        //add thread-id to group notification.
+        let patientId = userInfo["thread-id"] as! String
+        bestAttemptContent.threadIdentifier = patientId
+    }
     if (application.applicationState == UIApplicationStateActive
         || application.applicationState == UIApplicationStateInactive) {
         [userInfoMutable setValue:@(NO) forKey:@"wasTapped"];
@@ -234,7 +241,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 
     // app is in background
     }
-
+    
     completionHandler(UIBackgroundFetchResultNoData);
 }
 // [END receive_message iOS < 10]
